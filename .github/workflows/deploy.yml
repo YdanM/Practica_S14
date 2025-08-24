@@ -1,0 +1,39 @@
+name: CI/CD DevOps App
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  build-and-push-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Iniciar sesión en Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Construir imagen Docker
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/hola-devops:latest .
+
+      - name: Subir imagen a Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/hola-devops:latest
+
+  deploy-to-render:
+    needs: build-and-push-docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Desplegar en Render
+        run: |
+          curl -X POST \
+            -H "Accept: application/json" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            https://api.render.com/v1/services/srv-d2ljsiruibrs73fbb1vg/deploys
