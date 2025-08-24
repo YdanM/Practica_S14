@@ -3,7 +3,7 @@ name: CI/CD DevOps App
 on:
   push:
     branches:
-      - main  
+      - main   # Se ejecuta cuando haces push a main
 
 jobs:
   build-and-push-docker:
@@ -37,4 +37,3 @@ jobs:
             -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
             -H "Content-Type: application/json" \
             https://api.render.com/v1/services/srv-d2ljsiruibrs73fbb1vg/deploys
-#First commit
